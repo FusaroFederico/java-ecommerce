@@ -60,4 +60,8 @@ public class GestoreUtenti {
     public void aggiungiUtente(Utente utente) {
         utentiRegistrati.add(utente);
     }
+    
+    public List<Utente> getUtentiRegistrati(){
+    	return this.utentiRegistrati;
+    }
 }

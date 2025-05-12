@@ -27,6 +27,16 @@ public class AppStarter {
         
         // Caricamento dati da file
         gestoreUtenti.caricaUtenti();
+        // Aggiorna dati utenti
+        // Ogni volta che fai una modifica ad una classe modello
+        // ricordati di aggiornare i dati con le cose mancanti o
+        // potrebbero avvenire delle eccezioni impreviste
+        /**
+         * for ( Utente utente : gestoreUtenti.getUtentiRegistrati()) {
+        	if (utente.getCarrello() == null) {
+        		utente.setCarrello(new ArrayList<>());
+        	}
+        }**/
         gestoreProdotti.caricaProdotti();
     }
 	
@@ -100,9 +110,10 @@ public class AppStarter {
             System.out.println("1. Visualizza tutti i prodotti");
             System.out.println("2. Cerca prodotto");
             System.out.println("3. Acquista prodotto");
-            System.out.println("4. Metti in vendita un prodotto");
-            System.out.println("5. I miei prodotti in vendita");
-            System.out.println("6. Il mio profilo");
+            System.out.println("4. Visualizza carrello");
+            System.out.println("5. Metti in vendita un prodotto");
+            System.out.println("6. I miei prodotti in vendita");
+            System.out.println("7. Il mio profilo");
             System.out.println("0. Logout");
             System.out.print("Scegli un'opzione: ");
             
@@ -119,14 +130,17 @@ public class AppStarter {
                     acquistaProdotto();
                     break;
                 case 4:
-                    vendiProdotto();
+                	mostraCarrello();
                     break;
                 case 5:
-                    mostraMieiProdotti();
+                	vendiProdotto();
                     break;
                 case 6:
-                    mostraProfilo();
+                	mostraMieiProdotti();
                     break;
+                case 7:
+                	mostraProfilo();
+                	break;
                 case 0:
                     utenteLoggato = null;
                     System.out.println("Logout effettuato con successo.");
@@ -165,6 +179,7 @@ public class AppStarter {
         	
         	if (!utenteLoggato.getCarrello().contains(prodotti.get(numeroProdotto - 1))) {
         		utenteLoggato.aggiungiAlCarrello(prodotti.get(numeroProdotto - 1));
+        		gestoreUtenti.salvaUtenti();
         		System.out.println("Prodotto aggiunto correttamente!");
         	} else {
         		System.out.println("Il prodotto è già presente nel carrello.");
@@ -304,6 +319,7 @@ public class AppStarter {
     
     // metodi per la gestione del carrello (sarebbe meglio creare una classe apposita)
     public static void mostraCarrello() {
+    	 System.out.println("\n===== CARRELLO =====");
     	List<Prodotto> carrello = utenteLoggato.getCarrello();
     	
     	if(carrello.isEmpty()) {
@@ -318,7 +334,35 @@ public class AppStarter {
         }
     	
     	// Opzioni carrello
-    	
+    	System.out.println("\nOpzioni carrello:");
+    	System.out.println("1. Rimuovi un prodotto");
+    	System.out.println("2. Acquista un prodotto");
+    	System.out.println("Scegli un'opzione (0 per uscire dal menù carrello): ");
+    	int scelta = getIntInput();
+    	switch (scelta) {
+    	case 0:
+    		return;
+    	case 1:
+    		System.out.println("Inserisce il numero del prodotto che vuoi rimuovere: ");
+    		int numeroProdottoRim = getIntInput();
+    		if ( numeroProdottoRim > 0 && numeroProdottoRim <= carrello.size()) {
+    			rimuoviProdottoDalCarrello(numeroProdottoRim - 1);
+    		} else {
+    			System.out.println("Numero prodotto non valido.");
+    		}
+    		break;
+    	case 2:
+    		System.out.println("Inserisce il numero del prodotto che vuoi acquistare: ");
+    		int numeroProdottoAcq = getIntInput();
+    		if ( numeroProdottoAcq > 0 && numeroProdottoAcq <= carrello.size() ) {
+    			acquistaProdottoDalCarrello(numeroProdottoAcq - 1);
+    		} else {
+    			System.out.println("Numero prodotto non valido.");
+    		}
+    		break;
+    	default:
+    		System.out.println("Opzione non valida.");
+    	}
     }
     
     public static void rimuoviProdottoDalCarrello(int numeroProdotto) {
