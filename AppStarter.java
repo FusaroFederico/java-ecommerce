@@ -31,12 +31,17 @@ public class AppStarter {
         // Ogni volta che fai una modifica ad una classe modello
         // ricordati di aggiornare i dati con le cose mancanti o
         // potrebbero avvenire delle eccezioni impreviste
-        /**
+        /** aggiornamento dopo aver implementato il carrello
          * for ( Utente utente : gestoreUtenti.getUtentiRegistrati()) {
         	if (utente.getCarrello() == null) {
         		utente.setCarrello(new ArrayList<>());
         	}
         }**/
+        // aggiornamento dopo aver implementato il saldo
+        /**for (Utente utente : gestoreUtenti.getUtentiRegistrati()) {
+        	utente.setSaldo(0.00);
+        }
+        gestoreUtenti.salvaUtenti();**/
         gestoreProdotti.caricaProdotti();
     }
 	
@@ -255,6 +260,19 @@ public class AppStarter {
         String conferma = scanner.nextLine().trim().toLowerCase();
         
         if (conferma.equals("si")) {
+        	
+        	if (prodottoScelto.getPrezzo() > utenteLoggato.getSaldo()) {
+        		System.out.println("Il tuo saldo non è sufficiente per acquistare questo prodotto!");
+        		return;
+        	}
+        	// Aggiorna saldo compratore e venditore
+        	utenteLoggato.effettuaPagamento(prodottoScelto.getPrezzo());
+        	for(Utente utente : gestoreUtenti.getUtentiRegistrati()) {
+        		if(utente.getUsername().equals(prodottoScelto.getIdVenditore())) {
+        			utente.effettuaRicarica(prodottoScelto.getPrezzo());
+        		}
+        	}
+        	gestoreUtenti.salvaUtenti();
             // Aggiorna lo stato del prodotto
             prodottoScelto.decrementaQuantita();
             gestoreProdotti.salvaProdotti();
@@ -314,7 +332,6 @@ public class AppStarter {
     private static void mostraProfilo() {
         System.out.println("\n===== PROFILO UTENTE =====");
         System.out.println("Username: " + utenteLoggato.getUsername());
-        
     }
     
     // metodi per la gestione del carrello (sarebbe meglio creare una classe apposita)
@@ -392,9 +409,21 @@ public class AppStarter {
         }
         
     	System.out.println("Sei sicuro di voler acquistare " + prodottoSelezionato.getNome() + " ? (si/no): ");
-    	String scelta = scanner.nextLine().trim().toLowerCase();
+    	String conferma = scanner.nextLine().trim().toLowerCase();
     	
-    	if (scelta.equals("si")) {
+    	if (conferma.equals("si")) {
+    		if (prodottoSelezionato.getPrezzo() > utenteLoggato.getSaldo()) {
+        		System.out.println("Il tuo saldo non è sufficiente per acquistare questo prodotto!");
+        		return;
+        	}
+        	// Aggiorna saldo compratore e venditore
+        	utenteLoggato.effettuaPagamento(prodottoSelezionato.getPrezzo());
+        	for(Utente utente : gestoreUtenti.getUtentiRegistrati()) {
+        		if(utente.getUsername().equals(prodottoSelezionato.getIdVenditore())) {
+        			utente.effettuaRicarica(prodottoSelezionato.getPrezzo());
+        		}
+        	}
+        	gestoreUtenti.salvaUtenti();
     		prodottoSelezionato.decrementaQuantita();
     		utenteLoggato.rimuoviDalCarrello(prodottoSelezionato);
     		gestoreProdotti.salvaProdotti();

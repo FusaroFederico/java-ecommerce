@@ -10,19 +10,21 @@ public class Utente implements Serializable{
 	private String username;
 	private String password;
 	private List<Prodotto> carrello;
+	private double saldo;
 	
 	// costruttore
 	public Utente(String username, String password) {
 		this.username = username;
 		this.password = password;
-		this.carrello = new ArrayList<>();
+		this.carrello = new ArrayList<>();  // inizializza una list vuota
+		this.saldo = 0.00;
 	}
 	
 	// metodi getter e setter per accedere ai dati
 	public String getUsername() {
 		return this.username;
 	}
-	public void setUserName(String username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 	public String getPassword() {
@@ -36,6 +38,27 @@ public class Utente implements Serializable{
 	}
 	public void setCarrello(List<Prodotto> carrello) {
 		this.carrello = carrello;
+	}
+	
+	public double getSaldo() {
+		return this.saldo;
+	}
+	
+	public void setSaldo(double saldo) {
+		this.saldo = saldo;
+	}
+	
+	// metodi per il saldo
+	public void effettuaRicarica(double importo) {
+		if (importo > 0.00) {
+			this.saldo += importo;
+		}
+	}
+	
+	public void effettuaPagamento(double spesa) {
+		if (spesa > 0.00 && spesa <= saldo) {
+			this.saldo -= spesa;
+		}
 	}
 	
 	// metodi per il carrello
