@@ -332,6 +332,120 @@ public class AppStarter {
     private static void mostraProfilo() {
         System.out.println("\n===== PROFILO UTENTE =====");
         System.out.println("Username: " + utenteLoggato.getUsername());
+        System.out.println("Saldo: " + String.format("%.2f €", utenteLoggato.getSaldo()));
+        
+        System.out.println("\nOpzioni profilo:");
+        System.out.println("1. Cambia username");
+        System.out.println("2. Effettua una ricarica");
+        System.out.println("3. Cambia password");
+        System.out.println("Scegli una delle opzioni (0 per uscire dal profilo): ");
+        int scelta = getIntInput();
+        
+        switch (scelta) {
+        case 0:
+        	break;
+        case 1:
+        	System.out.println("\n===== CAMBIA USERNAME =====");
+        	System.out.println("Vuoi cambiare username? (si/no) ");
+        	String conferma = scanner.nextLine().trim().toLowerCase();
+        	
+        	if (conferma.equals("si")) {
+        		System.out.println("Inserisci il nuovo username: ");
+        		String nuovoUsername = scanner.nextLine();
+        		
+        		for( Utente utente : gestoreUtenti.getUtentiRegistrati()) {   // controlla se lo username è già presente nel database
+        			if (utente.getUsername().equals(nuovoUsername)) {
+        				System.out.println("Questo username non è disponibile!");
+        				return;
+        			}
+        		}
+        		
+        		System.out.println("Username disponibile. Inserisci la tua password per confermare la tua identità: ");
+        		String password = scanner.nextLine();
+        		
+        		if (!password.equals(utenteLoggato.getPassword())) {
+        			System.out.println("Password errata! Riprova.");
+        			return;
+        		}
+        		
+        		utenteLoggato.setUsername(nuovoUsername);
+        		gestoreUtenti.salvaUtenti();
+        		System.out.println("Username cambiato con successo!");
+        	} else {
+        		System.out.println("Operazione annullata!");
+        	}
+        	break;
+        case 2:
+        	System.out.println("\n===== EFFETTUA RICARICA =====");
+        	
+        	double[] importiDisponibili = {20.00, 50.00, 100.00};
+        	System.out.println("\nImporti disponibili:");
+        	for (int i = 0; i < importiDisponibili.length; i++) {
+        		System.out.println((i+1) + ". " + String.format("%.2f €", importiDisponibili[i]));
+        	}
+        	
+        	System.out.println("Seleziona un importo tra quelli disponibili: ");
+        	int importoScelto = getIntInput();
+        	
+        	if ( importoScelto <= 0 || importoScelto > importiDisponibili.length) {
+        		System.out.println("Scelta non valida.");
+        		break;
+        	}
+        	
+        	System.out.println("Stai per ricaricare il tuo saldo di '" + importiDisponibili[importoScelto - 1] + " €' .");
+        	System.out.println("Sicuro di voler procedere? (si/no)");
+        	String conferma2 = scanner.nextLine().trim().toLowerCase();
+        	
+        	if (conferma2.equals("si")) {
+        		System.out.println("Inserisci la tua password per sicurezza:");
+        		String password = scanner.nextLine();
+        		
+        		if(!password.equals(utenteLoggato.getPassword())) {
+        			System.out.println("Password errata! Riprova.");
+        		}
+        		
+        		utenteLoggato.effettuaRicarica(importiDisponibili[importoScelto - 1]);
+        		gestoreUtenti.salvaUtenti();
+        		System.out.println("Ricarica effettuata con successo!");
+        	} else {
+        		System.out.println("Operazione annullata!");
+        	}
+        	break;
+        case 3:
+        	System.out.println("\n===== CAMBIA PASSWORD =====");
+        	
+        	System.out.println("Sicuro di voler cambiare password? (si/no):");
+        	String conferma3 = scanner.nextLine().trim().toLowerCase();
+        	
+        	if(conferma3.equals("si")) {
+        		System.out.println("Inserisci la password attuale:");
+        		String passwordAttuale = scanner.nextLine();
+        		
+        		if (!passwordAttuale.equals(utenteLoggato.getPassword())) {
+        			System.out.println("Password errata!");
+        			return;
+        		}
+        		
+        		System.out.println("Password corretta!");
+        		System.out.println("Inserisci la nuova password:");
+        		String nuovaPassword = scanner.nextLine();
+        		
+        		System.out.println("Inserisci nuovamente la password per conferma:");
+        		String nuovaPassword2 = scanner.nextLine();
+        		
+        		if (!nuovaPassword.equals(nuovaPassword2)) {
+        			System.out.println("Le password non corrispondono! Riprova.");
+        			return;
+        		}
+        		
+        		utenteLoggato.setPassword(nuovaPassword2);
+        		gestoreUtenti.salvaUtenti();
+        		System.out.println("Password cambiata correttamente!");
+        	} else {
+        		System.out.println("Operazione annullata!");
+        	}
+        	break;
+        }
     }
     
     // metodi per la gestione del carrello (sarebbe meglio creare una classe apposita)
