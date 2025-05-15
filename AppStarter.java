@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.java.snacks.ecommerce.gestione.GestoreProdotti;
 import org.java.snacks.ecommerce.gestione.GestoreUtenti;
+import org.java.snacks.ecommerce.gestione.GestoreCarrello;
 import org.java.snacks.ecommerce.modelli.Prodotto;
 import org.java.snacks.ecommerce.modelli.Utente;
 
@@ -18,6 +19,7 @@ public class AppStarter {
 	public static void main(String[] args) {
 		inizializzazione();
         mostraMenuIniziale();
+        scanner.close();
 	}
 	
 	private static void inizializzazione() {
@@ -135,7 +137,7 @@ public class AppStarter {
                     acquistaProdotto();
                     break;
                 case 4:
-                	mostraCarrello();
+                	GestoreCarrello.mostraCarrello(utenteLoggato, gestoreUtenti, gestoreProdotti, scanner);
                     break;
                 case 5:
                 	vendiProdotto();
@@ -217,11 +219,7 @@ public class AppStarter {
         List<Prodotto> prodottiDisponibili = gestoreProdotti.prendiTuttiProdotti();
         
         // rimuove i prodotti esauriti
-        for(Prodotto prodotto : prodottiDisponibili) {
-        	if (prodotto.getQuantita() <= 0) {
-        		prodottiDisponibili.remove(prodotto);
-        	}
-        }
+        prodottiDisponibili.removeIf(p -> p.getQuantita() <= 0);
         
         if (prodottiDisponibili.isEmpty()) {
             System.out.println("Nessun prodotto disponibile per l'acquisto.");
@@ -353,11 +351,10 @@ public class AppStarter {
         		System.out.println("Inserisci il nuovo username: ");
         		String nuovoUsername = scanner.nextLine();
         		
-        		for( Utente utente : gestoreUtenti.getUtentiRegistrati()) {   // controlla se lo username è già presente nel database
-        			if (utente.getUsername().equals(nuovoUsername)) {
-        				System.out.println("Questo username non è disponibile!");
-        				return;
-        			}
+        		// controlla se lo username è già presente nel database
+        		if (gestoreUtenti.esisteUtente(nuovoUsername)) {
+        			System.out.println("Questo username non è disponibile!");
+    				return;
         		}
         		
         		System.out.println("Username disponibile. Inserisci la tua password per confermare la tua identità: ");
@@ -446,104 +443,6 @@ public class AppStarter {
         	}
         	break;
         }
-    }
-    
-    // metodi per la gestione del carrello (sarebbe meglio creare una classe apposita)
-    public static void mostraCarrello() {
-    	 System.out.println("\n===== CARRELLO =====");
-    	List<Prodotto> carrello = utenteLoggato.getCarrello();
-    	
-    	if(carrello.isEmpty()) {
-    		System.out.println("Il tuo carrello è vuoto.");
-    		return;
-    	}
-    	
-    	System.out.println("Al momento nel tuo carrello ci sono i seguenti prodotti:");
-    	for (int i = 0; i < carrello.size(); i++) {
-            Prodotto prodotto = carrello.get(i);
-            System.out.println((i+1) + ". " + prodotto + " ");
-        }
-    	
-    	// Opzioni carrello
-    	System.out.println("\nOpzioni carrello:");
-    	System.out.println("1. Rimuovi un prodotto");
-    	System.out.println("2. Acquista un prodotto");
-    	System.out.println("Scegli un'opzione (0 per uscire dal menù carrello): ");
-    	int scelta = getIntInput();
-    	switch (scelta) {
-    	case 0:
-    		return;
-    	case 1:
-    		System.out.println("Inserisce il numero del prodotto che vuoi rimuovere: ");
-    		int numeroProdottoRim = getIntInput();
-    		if ( numeroProdottoRim > 0 && numeroProdottoRim <= carrello.size()) {
-    			rimuoviProdottoDalCarrello(numeroProdottoRim - 1);
-    		} else {
-    			System.out.println("Numero prodotto non valido.");
-    		}
-    		break;
-    	case 2:
-    		System.out.println("Inserisce il numero del prodotto che vuoi acquistare: ");
-    		int numeroProdottoAcq = getIntInput();
-    		if ( numeroProdottoAcq > 0 && numeroProdottoAcq <= carrello.size() ) {
-    			acquistaProdottoDalCarrello(numeroProdottoAcq - 1);
-    		} else {
-    			System.out.println("Numero prodotto non valido.");
-    		}
-    		break;
-    	default:
-    		System.out.println("Opzione non valida.");
-    	}
-    }
-    
-    public static void rimuoviProdottoDalCarrello(int numeroProdotto) {
-    	Prodotto prodottoDaRimuovere = utenteLoggato.getCarrello().get(numeroProdotto);
-    	System.out.println("Sei sicuro di voler rimuovere " + prodottoDaRimuovere.getNome() + " dal carrello? (si/no): ");
-    	String scelta = scanner.nextLine().trim().toLowerCase();
-    	
-    	if (scelta.equals("si")) {
-    		utenteLoggato.rimuoviDalCarrello(prodottoDaRimuovere);
-    		gestoreUtenti.salvaUtenti();
-    		System.out.println("Il prodotto è stato rimosso correttamente.");
-    	}
-    }
-    
-    public static void acquistaProdottoDalCarrello(int numeroProdotto) {
-    	Prodotto prodottoSelezionato = utenteLoggato.getCarrello().get(numeroProdotto);
-    	
-    	// Non permettere l'acquisto dei propri prodotti
-        if (prodottoSelezionato.getIdVenditore().equals(utenteLoggato.getUsername())) {
-            System.out.println("Non puoi acquistare i tuoi stessi prodotti.");
-            return;
-        }
-        // Non permette l'acquisto di prodotti esauriti
-        if (prodottoSelezionato.getQuantita() == 0) {
-        	System.out.println("Spiacenti, il prodotto è esaurito.");
-            return;
-        }
-        
-    	System.out.println("Sei sicuro di voler acquistare " + prodottoSelezionato.getNome() + " ? (si/no): ");
-    	String conferma = scanner.nextLine().trim().toLowerCase();
-    	
-    	if (conferma.equals("si")) {
-    		if (prodottoSelezionato.getPrezzo() > utenteLoggato.getSaldo()) {
-        		System.out.println("Il tuo saldo non è sufficiente per acquistare questo prodotto!");
-        		return;
-        	}
-        	// Aggiorna saldo compratore e venditore
-        	utenteLoggato.effettuaPagamento(prodottoSelezionato.getPrezzo());
-        	for(Utente utente : gestoreUtenti.getUtentiRegistrati()) {
-        		if(utente.getUsername().equals(prodottoSelezionato.getIdVenditore())) {
-        			utente.effettuaRicarica(prodottoSelezionato.getPrezzo());
-        		}
-        	}
-        	gestoreUtenti.salvaUtenti();
-    		prodottoSelezionato.decrementaQuantita();
-    		utenteLoggato.rimuoviDalCarrello(prodottoSelezionato);
-    		gestoreProdotti.salvaProdotti();
-    		gestoreUtenti.salvaUtenti();
-    		System.out.println("Acquisto avvenuto con successo.");
-    	}
     }
     
 	// 2 metodi per prendere gli input dell'utente e gestire le eccezione in caso di input errato
