@@ -5,7 +5,7 @@ import java.util.*;
 import org.java.snacks.ecommerce.gestione.GestoreProdotti;
 import org.java.snacks.ecommerce.gestione.GestoreUtenti;
 import org.java.snacks.ecommerce.gestione.GestioneMenu;
-import org.java.snacks.ecommerce.modelli.Utente;
+import org.java.snacks.ecommerce.util.Sessione;
 
 public class AppStarter {
 	private static final String FILE_UTENTI = "utenti.dat";
@@ -13,11 +13,11 @@ public class AppStarter {
     private static GestoreUtenti gestoreUtenti;
     private static GestoreProdotti gestoreProdotti;
     private static Scanner scanner;
-    private static Utente utenteLoggato;
+    private static Sessione sessione;
 
 	public static void main(String[] args) {
 		inizializzazione();
-        GestioneMenu.mostraMenuIniziale(scanner, utenteLoggato, gestoreUtenti, gestoreProdotti);
+        GestioneMenu.mostraMenuIniziale(scanner, sessione, gestoreUtenti, gestoreProdotti);
         scanner.close();
 	}
 	
@@ -25,7 +25,7 @@ public class AppStarter {
         scanner = new Scanner(System.in);
         gestoreUtenti = new GestoreUtenti(FILE_UTENTI);
         gestoreProdotti = new GestoreProdotti(FILE_PRODOTTI);
-        utenteLoggato = null;
+        sessione = new Sessione();
         
         // Caricamento dati da file
         gestoreUtenti.caricaUtenti();

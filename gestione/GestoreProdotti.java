@@ -160,7 +160,7 @@ public class GestoreProdotti {
             System.out.println((i+1) + ". " + prodotto);
         }
         
-        System.out.print("\nInserisci il numero del prodotto che vuoi acquistare (0 per annullare): ");
+        System.out.println("\nInserisci il numero del prodotto che vuoi acquistare (0 per annullare): ");
         int sceltaUtente = GestioneMenu.getIntInput(scanner);
         
         if (sceltaUtente == 0) {
@@ -182,7 +182,7 @@ public class GestoreProdotti {
         }
         
         System.out.println("Hai selezionato: " + prodottoScelto);
-        System.out.print("Confermi l'acquisto? (si/no): ");
+        System.out.println("Confermi l'acquisto? (si/no): ");
         String conferma = scanner.nextLine().trim().toLowerCase();
         
         if (conferma.equals("si")) {
@@ -212,13 +212,13 @@ public class GestoreProdotti {
     
     public void vendiProdotto(Scanner scanner, Utente utenteLoggato) {
         System.out.println("\n===== METTI IN VENDITA UN PRODOTTO =====");
-        System.out.print("Nome del prodotto: ");
+        System.out.println("Nome del prodotto: ");
         String nome = scanner.nextLine();
-        System.out.print("Descrizione: ");
+        System.out.println("Descrizione: ");
         String descrizione = scanner.nextLine();
-        System.out.print("Prezzo (€): ");
+        System.out.println("Prezzo (€): ");
         double prezzo = GestioneMenu.getDoubleInput(scanner);
-        System.out.print("Quantità disponibile: ");
+        System.out.println("Quantità disponibile: ");
         int quantita = GestioneMenu.getIntInput(scanner);
         
         // controlla che la quantità sia intera e positiva

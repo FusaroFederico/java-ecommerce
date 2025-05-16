@@ -30,7 +30,7 @@ public class GestoreCarrello {
         System.out.println("1. Rimuovi un prodotto");
         System.out.println("2. Acquista un prodotto");
         // chiede all'utente di scegliere un'opzione
-        System.out.print("Scegli un'opzione (0 per uscire): ");
+        System.out.println("Scegli un'opzione (0 per uscire): ");
         int scelta = GestioneMenu.getIntInput(scanner);
         
         // switch per gestire le varie opzioni
@@ -39,7 +39,7 @@ public class GestoreCarrello {
             	// esce dal menù carrello
                 return;
             case 1:
-                System.out.print("Inserisci il numero del prodotto da rimuovere: ");
+                System.out.println("Inserisci il numero del prodotto da rimuovere: ");
                 int numeroProdottoRim = GestioneMenu.getIntInput(scanner);
                 // se il numero inserito dall'utente è valido procede alla rimozione
                 // altrimenti mostra un oppotruno messaggio
@@ -50,7 +50,7 @@ public class GestoreCarrello {
                 }
                 break;
             case 2:
-                System.out.print("Inserisci il numero del prodotto da acquistare: ");
+                System.out.println("Inserisci il numero del prodotto da acquistare: ");
                 int numeroProdottoAcq = GestioneMenu.getIntInput(scanner);
                 // se il numero è valido procede con l'acquisto
                 // altrimenti mostra un opportuno messaggio
@@ -69,7 +69,7 @@ public class GestoreCarrello {
     public static void rimuoviProdotto(Utente utente, int numeroProdotto, GestoreUtenti gestoreUtenti, Scanner scanner) {
         Prodotto prodotto = utente.getCarrello().get(numeroProdotto);
         // chiede all'utente di confermare 
-        System.out.print("Sei sicuro di voler rimuovere " + prodotto.getNome() + "? (si/no): ");
+        System.out.println("Sei sicuro di voler rimuovere " + prodotto.getNome() + "? (si/no): ");
         String conferma = scanner.nextLine().trim().toLowerCase();
 
         // se è si procede alla rimozione e al salvataggio
@@ -99,7 +99,7 @@ public class GestoreCarrello {
         }
         
         // chiede all'utente di confermare l'acquisto
-        System.out.print("Confermi l'acquisto di " + prodotto.getNome() + "? (si/no): ");
+        System.out.println("Confermi l'acquisto di " + prodotto.getNome() + "? (si/no): ");
         String conferma = scanner.nextLine().trim().toLowerCase();
         
         // se la risposta è diversa da "si" annulla l'acquisto

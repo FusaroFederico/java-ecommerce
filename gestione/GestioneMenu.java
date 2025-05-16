@@ -3,10 +3,11 @@ package org.java.snacks.ecommerce.gestione;
 import java.util.Scanner;
 
 import org.java.snacks.ecommerce.modelli.Utente;
+import org.java.snacks.ecommerce.util.Sessione;
 
 public class GestioneMenu {
 
-	public static void mostraMenuIniziale(Scanner scanner, Utente utenteLoggato, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+	public static void mostraMenuIniziale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
         while (true) {
             System.out.println("\n===== NEGOZIO ONLINE =====");
             System.out.println("1. Login");
@@ -18,7 +19,7 @@ public class GestioneMenu {
             
             switch (sceltaUtente) {
                 case 1:
-                    login(scanner, utenteLoggato, gestoreUtenti, gestoreProdotti);
+                    login(scanner, sessione, gestoreUtenti, gestoreProdotti);
                     break;
                 case 2:
                     registrazione(scanner, gestoreUtenti);
@@ -32,7 +33,7 @@ public class GestioneMenu {
         }
     }
 	
-	private static void login(Scanner scanner, Utente utenteLoggato, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+	private static void login(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
 		// chiede all'utente di inserire i proprio username e password
         System.out.println("\n===== LOGIN =====");
         System.out.print("Username: ");
@@ -45,9 +46,9 @@ public class GestioneMenu {
         // se l'autenticazione è avvenuta con successo salva l'utente come utenteLoggato,
         // e lancia il metodo mostraMenuPrincipale
         if (utente != null) {
-            utenteLoggato = utente;
-            System.out.println("Login effettuato con successo. Benvenuto " + utenteLoggato.getUsername() + "!");
-            mostraMenuPrincipale(scanner, utenteLoggato, gestoreUtenti, gestoreProdotti);
+            sessione.setUtenteLoggato(utente);
+            System.out.println("Login effettuato con successo. Benvenuto " + utente.getUsername() + "!");
+            mostraMenuPrincipale(scanner, sessione, gestoreUtenti, gestoreProdotti);
         } else {
         	// Altrimenti visualizza un opportuno messaggio
             System.out.println("Username o password non validi.");
@@ -78,7 +79,7 @@ public class GestioneMenu {
         System.out.println("Registrazione completata con successo! Ora puoi effettuare il login.");
     }
     
-    private static void mostraMenuPrincipale(Scanner scanner, Utente utenteLoggato, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+    private static void mostraMenuPrincipale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
         while (true) {
             System.out.println("\n===== MENU PRINCIPALE =====");
             System.out.println("1. Visualizza tutti i prodotti");
@@ -89,34 +90,34 @@ public class GestioneMenu {
             System.out.println("6. I miei prodotti in vendita");
             System.out.println("7. Il mio profilo");
             System.out.println("0. Logout");
-            System.out.print("Scegli un'opzione: ");
+            System.out.println("Scegli un'opzione: ");
             
             int sceltaUtente = getIntInput(scanner);
             
             switch (sceltaUtente) {
                 case 1:
-                    gestoreProdotti.mostraTuttiProdotti(scanner, utenteLoggato, gestoreUtenti);
+                    gestoreProdotti.mostraTuttiProdotti(scanner, sessione.getUtenteLoggato(), gestoreUtenti);
                     break;
                 case 2:
-                	gestoreProdotti.cercaProdottoPerNome(scanner, utenteLoggato, gestoreUtenti);
+                	gestoreProdotti.cercaProdottoPerNome(scanner, sessione.getUtenteLoggato(), gestoreUtenti);
                     break;
                 case 3:
-                	gestoreProdotti.acquistaProdotto(scanner, utenteLoggato, gestoreUtenti);
+                	gestoreProdotti.acquistaProdotto(scanner, sessione.getUtenteLoggato(), gestoreUtenti);
                     break;
                 case 4:
-                	GestoreCarrello.mostraCarrello(utenteLoggato, gestoreUtenti, gestoreProdotti, scanner);
+                	GestoreCarrello.mostraCarrello(sessione.getUtenteLoggato(), gestoreUtenti, gestoreProdotti, scanner);
                     break;
                 case 5:
-                	gestoreProdotti.vendiProdotto(scanner, utenteLoggato);
+                	gestoreProdotti.vendiProdotto(scanner, sessione.getUtenteLoggato());
                     break;
                 case 6:
-                	gestoreProdotti.mostraMieiProdotti(utenteLoggato);
+                	gestoreProdotti.mostraMieiProdotti(sessione.getUtenteLoggato());
                     break;
                 case 7:
-                	mostraProfilo(utenteLoggato, scanner, gestoreUtenti);
+                	mostraProfilo(sessione.getUtenteLoggato(), scanner, gestoreUtenti);
                 	break;
                 case 0:
-                    utenteLoggato = null;
+                    sessione.logout();
                     System.out.println("Logout effettuato con successo.");
                     return;
                 default:
@@ -244,6 +245,7 @@ public class GestioneMenu {
     }
     
     // 2 metodi per prendere gli input dell'utente e gestire le eccezione in caso di input errato
+    // li potresti mettere in una classe di utilità dove vanno tutti questi metodi condivisi
     public static int getIntInput(Scanner scanner) {
         try {
             return Integer.parseInt(scanner.nextLine());
