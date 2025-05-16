@@ -31,7 +31,7 @@ public class GestoreCarrello {
         System.out.println("2. Acquista un prodotto");
         // chiede all'utente di scegliere un'opzione
         System.out.print("Scegli un'opzione (0 per uscire): ");
-        int scelta = getIntInput(scanner);
+        int scelta = GestioneMenu.getIntInput(scanner);
         
         // switch per gestire le varie opzioni
         switch (scelta) {
@@ -40,7 +40,7 @@ public class GestoreCarrello {
                 return;
             case 1:
                 System.out.print("Inserisci il numero del prodotto da rimuovere: ");
-                int numeroProdottoRim = getIntInput(scanner);
+                int numeroProdottoRim = GestioneMenu.getIntInput(scanner);
                 // se il numero inserito dall'utente è valido procede alla rimozione
                 // altrimenti mostra un oppotruno messaggio
                 if (numeroProdottoRim > 0 && numeroProdottoRim <= carrello.size()) {
@@ -51,7 +51,7 @@ public class GestoreCarrello {
                 break;
             case 2:
                 System.out.print("Inserisci il numero del prodotto da acquistare: ");
-                int numeroProdottoAcq = getIntInput(scanner);
+                int numeroProdottoAcq = GestioneMenu.getIntInput(scanner);
                 // se il numero è valido procede con l'acquisto
                 // altrimenti mostra un opportuno messaggio
                 if (numeroProdottoAcq > 0 && numeroProdottoAcq <= carrello.size()) {
@@ -66,7 +66,7 @@ public class GestoreCarrello {
     }
 
     // metodo per la rimozione di un prodotto dal carrello
-    private static void rimuoviProdotto(Utente utente, int numeroProdotto, GestoreUtenti gestoreUtenti, Scanner scanner) {
+    public static void rimuoviProdotto(Utente utente, int numeroProdotto, GestoreUtenti gestoreUtenti, Scanner scanner) {
         Prodotto prodotto = utente.getCarrello().get(numeroProdotto);
         // chiede all'utente di confermare 
         System.out.print("Sei sicuro di voler rimuovere " + prodotto.getNome() + "? (si/no): ");
@@ -81,7 +81,7 @@ public class GestoreCarrello {
         }
     }
 
-    private static void acquistaProdotto(Utente utente, Prodotto prodotto, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti, Scanner scanner) {
+    public static void acquistaProdotto(Utente utente, Prodotto prodotto, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti, Scanner scanner) {
         // controlla che il compratore non sia il venditore
     	if (prodotto.getIdVenditore().equals(utente.getUsername())) {
             System.out.println("Non puoi acquistare i tuoi stessi prodotti.");
@@ -126,11 +126,22 @@ public class GestoreCarrello {
         System.out.println("Acquisto completato con successo.");
     }
     
-    private static int getIntInput(Scanner scanner) {
-        try {
-            return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+    public static void aggiungiProdottoAlCarrello(Utente utente, GestoreUtenti gestoreUtenti, Prodotto prodotto) {
+    	// controlla che il prodotto esiste
+    	if (prodotto == null) {
+    		System.out.println("Impossibile aggiungere il prodotto.");
+    		return;
+    	}
+    	// se il prodotto non è già presente nel carrello utente
+    	// procede ad aggiungerlo e al salvataggio
+    	if (!utente.getCarrello().contains(prodotto)) {
+    		utente.aggiungiAlCarrello(prodotto);
+    		gestoreUtenti.salvaUtenti();
+    		System.out.println("Prodotto aggiunto correttamente!");
+    	} else {
+    		// altrimenti visualizza un opportuno messaggio
+    		System.out.println("Il prodotto è già presente nel carrello.");
+    	}
     }
+   
 }
