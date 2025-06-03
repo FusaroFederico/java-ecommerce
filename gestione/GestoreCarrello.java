@@ -11,6 +11,7 @@ public class GestoreCarrello {
 	// metodo che mostra il carrello e le relative opzioni
     public static void mostraCarrello(Utente utente, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti, Scanner scanner) {
         System.out.println("\n===== CARRELLO =====");
+        // prende il carrello dell'utente loggato
         List<Prodotto> carrello = utente.getCarrello();
 
         // mostra un opportuno messaggio se il carrello è vuoto

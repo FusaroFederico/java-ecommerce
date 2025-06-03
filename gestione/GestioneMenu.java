@@ -2,12 +2,16 @@ package org.java.snacks.ecommerce.gestione;
 
 import java.util.Scanner;
 
+import org.java.snacks.ecommerce.giochi.battagliaNavale.GestioneSalvataggi;
+import org.java.snacks.ecommerce.giochi.battagliaNavale.MenuBattagliaNavale;
 import org.java.snacks.ecommerce.modelli.Utente;
 import org.java.snacks.ecommerce.util.Sessione;
 
 public class GestioneMenu {
 
-	public static void mostraMenuIniziale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+	// metodo che mostra il menù iniziale con login, registrati o esci
+	public static void mostraMenuIniziale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti,
+												GestioneSalvataggi gestioneSalvataggi) {
         while (true) {
             System.out.println("\n===== NEGOZIO ONLINE =====");
             System.out.println("1. Login");
@@ -19,12 +23,15 @@ public class GestioneMenu {
             
             switch (sceltaUtente) {
                 case 1:
-                    login(scanner, sessione, gestoreUtenti, gestoreProdotti);
+                	// lancia il metodo Login
+                    login(scanner, sessione, gestoreUtenti, gestoreProdotti, gestioneSalvataggi);
                     break;
                 case 2:
+                	// lancia il metodo registrazione
                     registrazione(scanner, gestoreUtenti);
                     break;
                 case 0:
+                	// chiude il programma
                     System.out.println("Grazie per aver utilizzato il nostro store. Arrivederci!");
                     System.exit(0);
                 default:
@@ -33,7 +40,9 @@ public class GestioneMenu {
         }
     }
 	
-	private static void login(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+	// metodo per il login utente
+	private static void login(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti,
+										GestioneSalvataggi gestioneSalvataggi) {
 		// chiede all'utente di inserire i proprio username e password
         System.out.println("\n===== LOGIN =====");
         System.out.print("Username: ");
@@ -48,13 +57,14 @@ public class GestioneMenu {
         if (utente != null) {
             sessione.setUtenteLoggato(utente);
             System.out.println("Login effettuato con successo. Benvenuto " + utente.getUsername() + "!");
-            mostraMenuPrincipale(scanner, sessione, gestoreUtenti, gestoreProdotti);
+            mostraMenuPrincipale(scanner, sessione, gestoreUtenti, gestoreProdotti, gestioneSalvataggi);
         } else {
         	// Altrimenti visualizza un opportuno messaggio
             System.out.println("Username o password non validi.");
         }
     }
     
+	// metodo per la registrazione
     private static void registrazione(Scanner scanner, GestoreUtenti gestoreUtenti) {
         System.out.println("\n===== REGISTRAZIONE =====");
         System.out.print("Inserisci il tuo Username: ");
@@ -79,7 +89,9 @@ public class GestioneMenu {
         System.out.println("Registrazione completata con successo! Ora puoi effettuare il login.");
     }
     
-    private static void mostraMenuPrincipale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti) {
+    // metodo che mostra il menù principale con tutte le varie opzioni
+    private static void mostraMenuPrincipale(Scanner scanner, Sessione sessione, GestoreUtenti gestoreUtenti, GestoreProdotti gestoreProdotti, 
+    											GestioneSalvataggi gestioneSalvataggi) {
         while (true) {
             System.out.println("\n===== MENU PRINCIPALE =====");
             System.out.println("1. Visualizza tutti i prodotti");
@@ -89,6 +101,7 @@ public class GestioneMenu {
             System.out.println("5. Metti in vendita un prodotto");
             System.out.println("6. I miei prodotti in vendita");
             System.out.println("7. Il mio profilo");
+            System.out.println("8. Giochi");
             System.out.println("0. Logout");
             System.out.println("Scegli un'opzione: ");
             
@@ -116,6 +129,9 @@ public class GestioneMenu {
                 case 7:
                 	mostraProfilo(sessione.getUtenteLoggato(), scanner, gestoreUtenti);
                 	break;
+                case 8:
+                	MenuBattagliaNavale.menuPrincipale(scanner, sessione.getUtenteLoggato(), gestioneSalvataggi);
+                	break;
                 case 0:
                     sessione.logout();
                     System.out.println("Logout effettuato con successo.");
@@ -126,6 +142,7 @@ public class GestioneMenu {
         }
     }
     
+    // metodo per la visualizzazione e gestione del proprio profilo utente
     private static void mostraProfilo(Utente utenteLoggato, Scanner scanner, GestoreUtenti gestoreUtenti) {
         System.out.println("\n===== PROFILO UTENTE =====");
         System.out.println("Username: " + utenteLoggato.getUsername());
@@ -158,12 +175,12 @@ public class GestioneMenu {
         		
         		System.out.println("Username disponibile. Inserisci la tua password per confermare la tua identità: ");
         		String password = scanner.nextLine();
-        		
+        		// controlla che la password sia giusta
         		if (!password.equals(utenteLoggato.getPassword())) {
         			System.out.println("Password errata! Riprova.");
         			return;
         		}
-        		
+        		// se tutto corrisponde salva i nuovi dati
         		utenteLoggato.setUsername(nuovoUsername);
         		gestoreUtenti.salvaUtenti();
         		System.out.println("Username cambiato con successo!");
@@ -173,9 +190,10 @@ public class GestioneMenu {
         	break;
         case 2:
         	System.out.println("\n===== EFFETTUA RICARICA =====");
-        	
+        	// array di double con gli importi possibili
         	double[] importiDisponibili = {20.00, 50.00, 100.00};
         	System.out.println("\nImporti disponibili:");
+        	// per ogni elemento dell'array genera una riga e la visualizza
         	for (int i = 0; i < importiDisponibili.length; i++) {
         		System.out.println((i+1) + ". " + String.format("%.2f €", importiDisponibili[i]));
         	}
@@ -187,7 +205,7 @@ public class GestioneMenu {
         		System.out.println("Scelta non valida.");
         		break;
         	}
-        	
+        
         	System.out.println("Stai per ricaricare il tuo saldo di '" + importiDisponibili[importoScelto - 1] + " €' .");
         	System.out.println("Sicuro di voler procedere? (si/no)");
         	String conferma2 = scanner.nextLine().trim().toLowerCase();

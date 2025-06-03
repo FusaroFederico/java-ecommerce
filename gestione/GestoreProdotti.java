@@ -10,17 +10,20 @@ public class GestoreProdotti {
 	private List<Prodotto> inventario;
     private String fileProdotti;
     
+    // costruttore
     public GestoreProdotti(String nomeFile) {
         this.fileProdotti = nomeFile;
         this.inventario = new ArrayList<>();
     }
 
+    // metodo che ci permette di caricare i dati da file
     public void caricaProdotti() {
         File file = new File(fileProdotti);
         if (!file.exists()) {
             return;
         }
-
+        // blocco try-catch che prende i dati e li converte in una List java.
+        // se avviene un eccezione visualizza un messaggio di errore
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             inventario = (ArrayList<Prodotto>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
@@ -30,6 +33,8 @@ public class GestoreProdotti {
         }
     }
 
+    // metodo che salva i dati su file, in pratica fa l'operazione inversa del metodo sopra.
+    // anche qui in caso di errore visualizza un messaggio
     public void salvaProdotti() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileProdotti))) {
             oos.writeObject(inventario);
@@ -38,12 +43,17 @@ public class GestoreProdotti {
         }
     }
 
+    // metodo che restituisce una List con tutti i prodotti
     public List<Prodotto> prendiTuttiProdotti() {
         return new ArrayList<>(inventario);
     }
 
+    // metodo che restituisce i prodotti di un venditore dato l'id
     public List<Prodotto> cercaProdottiDatoVenditore(String idVenditore) {
+    	// crea una lista vuota
         List<Prodotto> risultati = new ArrayList<>();
+        // poi scorre tutti i prodotti nell'inventario e aggiunge alla lista solo quelli
+        // con l'idVenditore giusto
         for (Prodotto prodotto : inventario) {
             if (prodotto.getIdVenditore().equals(idVenditore)) {
                 risultati.add(prodotto);
@@ -52,6 +62,8 @@ public class GestoreProdotti {
         return risultati;
     }
 
+    // metodo che conta i prodotti nell'inventario e restituisce
+    // il prossimo id prodotto
     public int prossimoIdProdotto() {
         int maxId = 0;
         for (Prodotto prodotto : inventario) {
@@ -62,6 +74,7 @@ public class GestoreProdotti {
         return maxId + 1;
     }
     
+    // metodo che visualizza la lista ordinata di tutti i prodotti
     public void mostraTuttiProdotti(Scanner scanner, Utente utente, GestoreUtenti gestoreUtenti) {
         System.out.println("\n===== TUTTI I PRODOTTI =====");
         // crea una lista con tutti i prodotti
@@ -73,15 +86,17 @@ public class GestoreProdotti {
             return;
         }
         
-        // visualizza uno ad uno i dettagli di tutti i prodotti
+        // visualizza uno ad uno i dettagli di tutti i prodotti in ordine
         for (int i = 0; i < prodotti.size(); i++) {
             Prodotto prodotto = prodotti.get(i);
             System.out.println((i+1) + ". " + prodotto);
         }
         
+        // chiede all'utente se vuole aggiungere un prodotto al carrello
         System.out.println("\nVuoi aggiungere un prodotto al carrello? (si/no): ");
         String scelta = scanner.nextLine().trim().toLowerCase();
         
+        // se risponde si, chiede quale prodotto vuole aggiungere
         if (scelta.equals("si")) {
         	System.out.println("Inserisci il numero del prodotto da aggiungere al carrello: ");
         	int numeroProdotto = GestioneMenu.getIntInput(scanner);
@@ -98,6 +113,7 @@ public class GestoreProdotti {
         
     }
     
+    // cerca i prodotti che contengono nel nome la parola cercata
     public void cercaProdottoPerNome(Scanner scanner, Utente utente, GestoreUtenti gestoreUtenti) {
         System.out.println("\n===== CERCA PRODOTTO =====");
         System.out.print("Inserisci il nome del prodotto da cercare: ");
@@ -124,6 +140,7 @@ public class GestoreProdotti {
             System.out.println((i+1) + ". " + prodotto);
         }
         
+        // chiede all'utente se vuole aggiungerne uno al carrello
         System.out.println("\nVuoi aggiungere uno dei prodotti al carrello? (si/no): ");
         String scelta = scanner.nextLine().trim().toLowerCase();
         
@@ -142,8 +159,10 @@ public class GestoreProdotti {
         }
     }
     
+    // metodo che contiene la logica per l'acquisto di un prodotto
     public void acquistaProdotto(Scanner scanner, Utente utenteLoggato, GestoreUtenti gestoreUtenti) {
         System.out.println("\n===== ACQUISTA PRODOTTO =====");
+        // crea una lista con tutti i prodotti
         List<Prodotto> prodottiDisponibili = prendiTuttiProdotti();
         
         // rimuove i prodotti esauriti
@@ -154,6 +173,7 @@ public class GestoreProdotti {
             return;
         }
         
+        // visualizza i prodotti disponibili
         System.out.println("Prodotti disponibili:");
         for (int i = 0; i < prodottiDisponibili.size(); i++) {
             Prodotto prodotto = prodottiDisponibili.get(i);
@@ -173,6 +193,7 @@ public class GestoreProdotti {
             return;
         }
         
+        // prende il prodotto scelto e lo salva 
         Prodotto prodottoScelto = prodottiDisponibili.get(sceltaUtente - 1);
         
         // Non permettere l'acquisto dei propri prodotti
@@ -181,12 +202,13 @@ public class GestoreProdotti {
             return;
         }
         
+        // chiede all'utente di confermare l'acquisto
         System.out.println("Hai selezionato: " + prodottoScelto);
         System.out.println("Confermi l'acquisto? (si/no): ");
         String conferma = scanner.nextLine().trim().toLowerCase();
         
         if (conferma.equals("si")) {
-        	
+        	// controlla che l'utente abbia abbastanza soldi per effettuare l'acquisto
         	if (prodottoScelto.getPrezzo() > utenteLoggato.getSaldo()) {
         		System.out.println("Il tuo saldo non è sufficiente per acquistare questo prodotto!");
         		return;
@@ -210,8 +232,11 @@ public class GestoreProdotti {
         }
     }
     
+    // metodo per mettere in vendita un prodotto
     public void vendiProdotto(Scanner scanner, Utente utenteLoggato) {
         System.out.println("\n===== METTI IN VENDITA UN PRODOTTO =====");
+        
+        // chiede all'utente di inserire i dettagli del prodotto
         System.out.println("Nome del prodotto: ");
         String nome = scanner.nextLine();
         System.out.println("Descrizione: ");
@@ -227,15 +252,8 @@ public class GestoreProdotti {
             return;
         }
         
-        // crea un nuovo prodotto con i dati inseriti dall'utente
-        Prodotto nuovoProdotto = new Prodotto(
-            prossimoIdProdotto(),
-            nome,
-            descrizione,
-            prezzo,
-            quantita,
-            utenteLoggato.getUsername()
-        );
+        // crea un nuovo prodotto con i dati inseriti dall'utente usando il costruttore
+        Prodotto nuovoProdotto = new Prodotto(prossimoIdProdotto(), nome, descrizione, prezzo, quantita, utenteLoggato.getUsername() );
         
         // infine aggiunge il prodotto all'inventario e salva
         inventario.add(nuovoProdotto);
@@ -244,6 +262,7 @@ public class GestoreProdotti {
         System.out.println("Prodotto aggiunto con successo!");
     }
     
+    // mostra un lista con i prodotti i propri prodotti in vendita
     public void mostraMieiProdotti(Utente utenteLoggato) {
         System.out.println("\n===== I MIEI PRODOTTI IN VENDITA =====");
         List<Prodotto> mieiProdotti = cercaProdottiDatoVenditore(utenteLoggato.getUsername());

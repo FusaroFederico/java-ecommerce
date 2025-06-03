@@ -9,7 +9,11 @@ public class Utente implements Serializable{
 	// variabili di instanza
 	private String username;
 	private String password;
-	private List<Prodotto> carrello;
+	/**
+	 * Una List è un insieme di oggetti ordinati e che ammette duplicati, è una specie di
+	 * array dinamico cioè che non ha una dimensione fissa
+	 */
+	private List<Prodotto> carrello; 
 	private double saldo;
 	
 	// costruttore

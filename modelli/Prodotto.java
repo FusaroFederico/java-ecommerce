@@ -1,6 +1,9 @@
 package org.java.snacks.ecommerce.modelli;
 import java.io.Serializable;
 
+/**
+ * Implementa l'interfaccia Serializable per poter essere salvata su file.
+ */
 public class Prodotto implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
@@ -24,7 +27,7 @@ public class Prodotto implements Serializable{
 		this.idVenditore = idVenditore;
 	}
 
-	// metodi per accedere alle variabili
+	// metodi per accedere alle variabili get e set
 	public int getId() {
 		return this.id;
 	}
@@ -87,6 +90,7 @@ public class Prodotto implements Serializable{
 		}
 	}
 	
+	// metodo toString per visualizzare le info dei prodotti
 	@Override
 	public String toString() {
 		return "Nome: " + this.nome + ", Descrizione: " + this.descrizione + ", Prezzo: " + this.prezzo + "€ , Categoria: " + 
