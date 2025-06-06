@@ -80,7 +80,7 @@ public class MenuBattagliaNavale {
         }
 
         // visualizza la lista delle partite
-        System.out.println("Partite disponibili:");
+        System.out.println("\nPartite disponibili:");
         for (int i = 0; i < partite.size(); i++) {
             Partita partita = partite.get(i);
             System.out.printf("%d. Partita interrota il: %s", i + 1, partita.getDataInterruzione().format(Partita.formatter));
@@ -124,5 +124,4 @@ public class MenuBattagliaNavale {
             }
         }
     }
-	
 }

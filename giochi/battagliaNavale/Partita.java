@@ -21,6 +21,7 @@ public class Partita implements Serializable {
     private LocalDateTime dataInizio;
     private LocalDateTime dataFine;
     private LocalDateTime dataInterruzione;
+    private Duration durataPartita;
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"); // serve per formattare la data 
 
     // costruttore
@@ -29,6 +30,7 @@ public class Partita implements Serializable {
         this.grigliaGiocatore = new Griglia();
         this.grigliaComputer = new Griglia();
         this.dataInizio = LocalDateTime.now();
+        this.durataPartita = Duration.ZERO;
     }
 
     // metodo per gestire turno giocatore e turno computer
@@ -51,8 +53,9 @@ public class Partita implements Serializable {
                 // se tutte le navi del computer sono affondate
                 if (grigliaComputer.tutteLeNaviAffondate()) {
                     System.out.println("Complimenti! Hai vinto!");   // visualizza il messaggio
-                    dataFine = LocalDateTime.now();                  // imposta la data di fine partita
+                    dataFine = LocalDateTime.now();					 // imposta la data di fine partita
                     partitaFinita = true;                            // imposta partitaFinita su true
+                    aumentaDurataPartita(); 						 // aumenta la durata della partita
                     break;  // esce dal ciclo
                 } else {
                 	// altrimenti passa al turno del computer
@@ -65,8 +68,10 @@ public class Partita implements Serializable {
     	            String scelta = scanner.nextLine();
     	            
     	            if (scelta.equalsIgnoreCase("si")) {
-    	            	dataInterruzione = LocalDateTime.now();   // imposta la data di interruzione
-    	            	partitaInterrotta = true;                 
+    	            	aumentaDurataPartita(); 						 // aumenta la durata della partita
+    	            	dataInterruzione = LocalDateTime.now();          // imposta la data di interruzione
+    	            	partitaInterrotta = true;          
+    	            	System.out.println("Durata partita finora: " + durataPartita.toSeconds());
     	            	return;
     	            } else if(scelta.equalsIgnoreCase("no")){
     	            	break;
@@ -83,6 +88,7 @@ public class Partita implements Serializable {
                 if (grigliaGiocatore.tutteLeNaviAffondate()) {
                     System.out.println("Peccato... hai perso!");
                     dataFine = LocalDateTime.now();
+                    aumentaDurataPartita(); 						 // aumenta la durata della partita
                     partitaFinita = true;
                 } else {
                     turnoGiocatore = true;
@@ -158,6 +164,27 @@ public class Partita implements Serializable {
     							dataFine.format(formatter), minuti, secondi, getVincitore());
     }
     
+    // metodo per calcolare la durata della partita
+    private void aumentaDurataPartita() {
+    	if ( !partitaInterrotta ) {
+    		
+    		if ( partitaFinita ) {
+    			// se la partita non è stata interrota ed è finita, calcola la durata facendo
+    			// la differenza tra inizio e fine
+    			durataPartita = Duration.between(dataInizio, dataFine);
+    		} else {
+    			// se la partita è stata interrotta adesso ma non è finita
+    			// aggiunge la differenza tra l'inizio e l'ora attuale
+    			durataPartita = durataPartita.plus(Duration.between(dataInizio, LocalDateTime.now()));
+    		}
+    		
+    	} else {
+    		// se la partita è stata interrotta più di una volta, aggiunge
+    		// la differenza tra quando è stata interrotta precedentemente e adesso
+    		durataPartita = durataPartita.plus(Duration.between(dataInterruzione, LocalDateTime.now()));
+    	}
+    }
+    
     // getter e setter
     public boolean partitaFinita() {
     	return partitaFinita;
@@ -183,12 +210,11 @@ public class Partita implements Serializable {
 		this.dataInterruzione = dataInterruzione;
 	}
 
+	public void setDurataPartita(Duration durataPartita) {
+		this.durataPartita = durataPartita;
+	}
+
 	public Duration getDurataPartita() {
-    	if ( dataInizio != null && dataFine != null) {
-    		return Duration.between(dataInizio, dataFine);
-    	}
-    	return Duration.ZERO;
-    }
-    
-    
+		return durataPartita;
+	}
 }
